@@ -1,0 +1,140 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="format-detection" content="telephone=no">
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        .content {
+            height: 100%;
+            border: 1px solid black;
+        }
+
+        .item-container {
+            height: 100%;
+            display: flex;
+            min-width: 600px;
+        }
+
+        .item {
+            margin-bottom: 0px;
+            padding: 2px;
+        }
+
+        .item-left {
+            border-right: 1px solid black;
+            flex-grow: 0;
+            flex-shrink: 0;
+            flex-basis: 200px;
+        }
+
+        .item-mid {
+            border-right: 1px solid black;
+            flex-grow: 3;
+        }
+
+        .item-right {
+            flex-grow: 0;
+            flex-shrink: 0;
+            flex-basis: 300px;
+        }
+
+        @media screen and (min-width: 0) and (max-width: 600px) {
+            .content {
+                overflow-x: scroll;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="content">
+        <div class="item-container">
+            <div class="item item-left">
+                <input type="text" @change="onTextChange($event)" v-model="numValue" />
+            </div>
+            <div class="item item-mid">
+                <select @change="onSelectChange($event)" v-model="selectValue">
+                    <option value="isPrime">isPrime</option>
+                    <option value="isFibonacci">isFibonacci</option>
+                </select>
+            </div>
+            <div class="item item-right">
+                <p>{{labelValue}}</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                numValue: '13',
+                selectValue: 'isPrime',
+                labelValue: 'true',
+                lastNum: '13'
+            },
+            methods: {
+                onSelectChange(event) {
+                    this.labelValue = this.calculate();
+                },
+                onTextChange(event) {
+                    /*
+                    In the first column, create an input field, where user can enter any number. 
+                    If the value entered by users are not integer, round it to the nearest integer. 
+                    If user enter negative values, replace it with 1.
+                    */
+                    if (isNaN(event.target.value)) {
+                        this.numValue = this.lastNum;
+                        return;
+                    }
+                    let value = Number(event.target.value);
+                    if (value < 0) {
+                        value = 1;
+                    }
+                    
+                    if (this.isFloat(value)) {
+                        value = Math.round(value);
+                    }
+                    
+                    this.lastNum = value;
+                    this.numValue = value;
+                    this.labelValue = this.calculate();
+                },
+                isFloat(num) {
+                    return num === num && num % 1 !== 0;
+                },
+                calculate() {
+                    return (this.selectValue == 'isPrime') ? this.isPrime(this.numValue) : this.isFibonacci(this.numValue);
+                },
+                isPrime(num) {
+                    for (let i = 2; i < num; i++) {
+                        if (num % i == 0) return false;
+                    }
+                    return num > 1;
+                },
+                isFibonacci(num) {
+                    // ( 5*N2 + 4 ) or ( 5*N2 – 4 ) 
+                    return (this.isSquare(5 * (num * num) - 4) || this.isSquare(5 * (num * num) + 4)) ? true : false;
+                },
+                isSquare(num) {
+                    return num > 0 && Math.sqrt(num) % 1 == 0;
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
